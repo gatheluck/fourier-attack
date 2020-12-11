@@ -1,1 +1,1 @@
-from .attack import get_eps
+from .attack import get_eps  # noqa
