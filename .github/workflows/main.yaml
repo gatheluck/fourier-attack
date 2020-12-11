@@ -9,39 +9,9 @@ on:
       - master
 
 jobs:
-  blaken:
-    name: Blaken code automatically
+  test:
+    name: Run tests with mypy, black and pytest
     runs-on: ubuntu-latest
-    steps:
-      - name: Checkout
-        uses: actions/checkout@v2
-
-      - name: Set up Python
-        uses: actions/setup-python@v1
-        with:
-          python-version: 3.8
-
-      - name: Install Black
-        run: pip install black
-
-      - name: Run black check
-        run: black --check .
-
-      - name: If needed, commit black changes to the pull request
-        if: failure()
-        run: |
-          black .
-          git config --global user.name 'autoblack'
-          git config --global user.email 'cclauss@users.noreply.github.com'
-          git remote set-url origin https://x-access-token:${{ secrets.GITHUB_TOKEN }}@github.com/$GITHUB_REPOSITORY
-          git checkout $GITHUB_HEAD_REF
-          git commit -am "fixup: Format Python code with Black"
-          git push
-
-  pytest:
-    name: Run tests with pytest
-    runs-on: ubuntu-latest
-    needs: blaken
     strategy:
       matrix:
         python-version: [3.8]
@@ -60,5 +30,29 @@ jobs:
           pip install poetry
           poetry install --no-interaction
 
-      - name: Run pytest
-        run: poetry run pytest tests
+      - name: Run mypy test
+        run: poetry run mypy fourier_attack tests
+
+      - name: Run black test
+        run: poetry run black --check fourier_attack tests
+
+      - name: Run isort test
+        run: poetry run isort --check-only .
+
+      - name: Run flake8 test
+        uses: tonybajan/flake8-check-action@v1.0.0
+        with:
+          ignore: E203,W503,W504
+          maxlinelength: 99
+          repotoken: ${{ secrets.GITHUB_TOKEN }}
+          select:  E3,E4,E5,E7,W6,F,B,G0
+
+      - name: Run pytest with coverage check
+        run: poetry run pytest tests --cov=./fourier_attack --cov-report=xml
+      
+      - name: Upload coverage to Codecov
+        if: ${{ matrix.python-version==3.8 }}
+        uses: codecov/codecov-action@v1
+        with:
+          file: ./coverage.xml
+          fail_ci_if_error: true
