@@ -1,5 +1,5 @@
-from typing import Tuple
 import random
+from typing import Tuple
 
 import torch
 from torch.types import _device

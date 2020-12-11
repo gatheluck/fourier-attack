@@ -45,6 +45,7 @@ jobs:
           ignore: E203,W503,W504
           maxlinelength: 99
           repotoken: ${{ secrets.GITHUB_TOKEN }}
+          select:  E3,E4,E5,E7,W6,F,B,G0
 
       - name: Run pytest
         run: poetry run pytest tests
