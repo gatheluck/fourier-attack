@@ -34,3 +34,16 @@ class TestSpectrumToBasis:
             ),
             ones,
         )
+
+
+class TestBasisSpectrum:
+    @pytest.fixture
+    def sample_sizes(self):
+        H, W = 32, 17
+        return H, W
+
+    def test__output_shape(self, sample_sizes):
+        H, W = sample_sizes
+        assert fourier_attack.fourier.basis.get_basis_spectrum(
+            H, W
+        ).size() == torch.Size([H * W, H, W])
