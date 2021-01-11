@@ -40,12 +40,7 @@ jobs:
         run: poetry run isort --check-only .
 
       - name: Run flake8 test
-        uses: tonybajan/flake8-check-action@v1.0.0
-        with:
-          ignore: E203,W503,W504
-          maxlinelength: 99
-          repotoken: ${{ secrets.GITHUB_TOKEN }}
-          select:  E3,E4,E5,E7,W6,F,B,G0
+        run: poetry run flake8 .
 
       - name: Run pytest with coverage check
         run: poetry run pytest tests --cov=./fourier_attack --cov-report=xml
