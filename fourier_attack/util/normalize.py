@@ -4,7 +4,7 @@ import torch
 from torch.types import _device
 
 
-class Normalizer(torch.nn.Module):
+class Normalizer(torch.nn.modules.Module):
     """Differetiable normalizer.
 
     Normalize input tensor without breaking computational graph.
@@ -23,6 +23,7 @@ class Normalizer(torch.nn.Module):
     from_pixcel_space : bool
         If True, an input tensor is represented in pixel space (=[0, 255.])
     """
+
     def __init__(
         self,
         input_size: int,
@@ -30,7 +31,7 @@ class Normalizer(torch.nn.Module):
         std: Tuple[float],
         device: _device,
         from_pixel_space: bool = True,
-    ):
+    ) -> None:
         super().__init__()
         self.from_pixel_space = from_pixel_space
         num_channel = len(mean)
@@ -49,11 +50,11 @@ class Normalizer(torch.nn.Module):
 
     def forward(self, x: torch.Tensor) -> torch.Tensor:
         if self.from_pixel_space:
-            x = x / 255.
+            x = x / 255.0
         return x.sub(self.mean).div(self.std)
 
 
-class Denormalizer(torch.nn.Module):
+class Denormalizer(torch.nn.modules.Module):
     """Differetiable denormalizer.
 
     Denormalize input tensor without breaking computational graph.
@@ -72,6 +73,7 @@ class Denormalizer(torch.nn.Module):
     to_pixcel_space : bool
         If True, an output tensor is represented in pixel space (=[0, 255.])
     """
+
     def __init__(
         self,
         input_size: int,
@@ -79,7 +81,7 @@ class Denormalizer(torch.nn.Module):
         std: Tuple[float],
         device: _device,
         to_pixel_space: bool = True,
-    ):
+    ) -> None:
         super().__init__()
         self.to_pixel_space = to_pixel_space
         num_channel = len(mean)
@@ -99,5 +101,5 @@ class Denormalizer(torch.nn.Module):
     def forward(self, x: torch.Tensor) -> torch.Tensor:
         x = x.mul(self.std).add(self.mean)
         if self.to_pixel_space:
-            x = x * 255.
+            x = x * 255.0
         return x

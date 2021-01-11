@@ -1,9 +1,9 @@
-from typing import Final
-import pytest
 import pathlib
+from typing import Final
+
+import pytest
 import torch
 import torchvision
-
 
 CIFAR10_ROOT: Final = pathlib.Path("data/cifar10")
 PRETRAONED_WEIGHT = pathlib.Path("tests/weight/cifar10_resnet50")
@@ -19,21 +19,33 @@ def cifar10_stats():
 
 @pytest.fixture
 def normalize_cifar10_loader():
-    transform = torchvision.transforms.Compose([
-        torchvision.transforms.ToTensor(),
-        torchvision.transforms.Normalize(CIFAR10_MEAN, CIFAR10_STD),
-    ])
-    dataset = torchvision.datasets.CIFAR10(str(CIFAR10_ROOT), False, transform, download=True)
-    return torch.utils.data.DataLoader(dataset, BATCH_SIZE, shuffle=False, num_workers=8)
+    transform = torchvision.transforms.Compose(
+        [
+            torchvision.transforms.ToTensor(),
+            torchvision.transforms.Normalize(CIFAR10_MEAN, CIFAR10_STD),
+        ]
+    )
+    dataset = torchvision.datasets.CIFAR10(
+        str(CIFAR10_ROOT), False, transform, download=True
+    )
+    return torch.utils.data.DataLoader(
+        dataset, BATCH_SIZE, shuffle=False, num_workers=8
+    )
 
 
 @pytest.fixture
 def denormalize_cifar10_loader():
-    transform = torchvision.transforms.Compose([
-        torchvision.transforms.ToTensor(),
-    ])
-    dataset = torchvision.datasets.CIFAR10(str(CIFAR10_ROOT), False, transform, download=True)
-    return torch.utils.data.DataLoader(dataset, BATCH_SIZE, shuffle=False, num_workers=8)
+    transform = torchvision.transforms.Compose(
+        [
+            torchvision.transforms.ToTensor(),
+        ]
+    )
+    dataset = torchvision.datasets.CIFAR10(
+        str(CIFAR10_ROOT), False, transform, download=True
+    )
+    return torch.utils.data.DataLoader(
+        dataset, BATCH_SIZE, shuffle=False, num_workers=8
+    )
 
 
 @pytest.fixture

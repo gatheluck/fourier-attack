@@ -1,1 +1,1 @@
-from .normalize import Normalizer, Denormalizer  # noqa
+from .normalize import Denormalizer, Normalizer  # noqa
