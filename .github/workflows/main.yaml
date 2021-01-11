@@ -40,7 +40,7 @@ jobs:
         run: poetry run isort --check-only .
 
       - name: Run flake8 test
-        uses: tonybajan/flake8-check-action@v1.0.0
+        uses: poetry run flake8 .
         with:
           ignore: E203,W503,W504
           maxlinelength: 99
