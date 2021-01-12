@@ -64,7 +64,9 @@ class PixelModel(torch.nn.Module):
     ) -> None:
         super().__init__()
         self.model = model
-        self.normalizer = fourier_attack.util.Normalizer(input_size, mean, std, device=device)
+        self.normalizer = fourier_attack.util.Normalizer(
+            input_size, mean, std, device=device
+        )
 
     def forward(self, pixel_x: torch.Tensor) -> torch.Tensor:
         x = self.normalizer(pixel_x)  # rescale [0, 255] -> [0, 1] and normalize

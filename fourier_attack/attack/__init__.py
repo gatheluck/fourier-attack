@@ -1,1 +1,1 @@
-from .attack import get_eps, PixelModel  # noqa
+from .attack import PixelModel, get_eps  # noqa
