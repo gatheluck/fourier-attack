@@ -1,5 +1,9 @@
+import pathlib
+from typing import Final, Tuple
+
 import pytest
 import torch
+import torchvision
 
 import fourier_attack.attack
 
@@ -41,3 +45,21 @@ class TestGetEps:
 
     def test_value(self):
         pass
+
+
+class TestPixcelModel:
+    def test__unit_space(self,
+                         cifar10_stats,
+                         denormalize_cifar10_loader,
+                         normalize_cifar10_loader):
+        model = torchvision.models.resnet50(pretrained=False, num_classes=10).eval()
+        devices = set(["cpu", "cuda"]) if torch.cuda.is_available() else set(["cpu"])
+        mean, std = cifar10_stats
+        for device in devices:
+            model = model.to(device)
+            pixel_model = fourier_attack.attack.PixelModel(model, 32, mean, std, device)
+
+            for (x_denorm, _), (x_norm, _) in zip(denormalize_cifar10_loader, normalize_cifar10_loader):
+                x_denorm, x_norm = x_denorm.to(device), x_norm.to(device)
+                assert pixel_model(255. * x_denorm).allclose(model(x_norm), atol=1e-5)  # if atol=1e-8, allclose returns False.
+                break
