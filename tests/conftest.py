@@ -6,7 +6,7 @@ import torch
 import torchvision
 
 CIFAR10_ROOT: Final = pathlib.Path("data/cifar10")
-PRETRAONED_WEIGHT = pathlib.Path("tests/weight/cifar10_resnet50")
+PRETRAONED_WEIGHT = pathlib.Path("tests/weight/cifar10_resnet50.pth")
 CIFAR10_MEAN: Final = [0.49139968, 0.48215841, 0.44653091]
 CIFAR10_STD: Final = [0.24703223, 0.24348513, 0.26158784]
 BATCH_SIZE = 16
