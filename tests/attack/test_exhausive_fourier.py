@@ -13,7 +13,7 @@ class TestExhausiveFourierAttack:
     ):
         devices = set(["cuda"]) if torch.cuda.is_available() else set([""])
         output_root: Final = pathlib.Path("logs/test/")
-        output_root.mkdir(exist_ok=True)
+        output_root.mkdir(exist_ok=True, parents=True)
 
         model = pretrained_cifar10_resnet50
         criterion_func = torch.nn.functional.cross_entropy
@@ -77,7 +77,7 @@ class TestExhausiveFourierAttack:
         eps_max: Final[float] = 8.0
         devices = set(["cuda"]) if torch.cuda.is_available() else set([""])
         output_root: Final = pathlib.Path("logs/test/")
-        output_root.mkdir(exist_ok=True)
+        output_root.mkdir(exist_ok=True, parents=True)
 
         model = pretrained_cifar10_resnet50
         criterion_func = torch.nn.functional.cross_entropy
