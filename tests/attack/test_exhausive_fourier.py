@@ -15,11 +15,11 @@ class TestExhausiveFourierAttack:
         output_root: Final = pathlib.Path("logs/test/")
         output_root.mkdir(exist_ok=True)
 
+        model = pretrained_cifar10_resnet50
         criterion_func = torch.nn.functional.cross_entropy
 
         mean, std = cifar10_stats
         for device in devices:
-            model = pretrained_cifar10_resnet50
             pixel_model = fourier_attack.attack.PixelModel(model, 32, mean, std, device)
 
             for x_denorm, t in denormalize_cifar10_loader:
@@ -79,11 +79,11 @@ class TestExhausiveFourierAttack:
         output_root: Final = pathlib.Path("logs/test/")
         output_root.mkdir(exist_ok=True)
 
+        model = pretrained_cifar10_resnet50
         criterion_func = torch.nn.functional.cross_entropy
 
         mean, std = cifar10_stats
         for device in devices:
-            model = pretrained_cifar10_resnet50
             attacker = fourier_attack.attack.exhausive_fourier.ExhausiveFourierAttack(
                 input_size, mean, std, eps_max, criterion_func, device
             )
