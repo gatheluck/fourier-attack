@@ -1,5 +1,6 @@
-import pytest
 import unittest
+
+import pytest
 import torch
 import torchvision
 
@@ -73,15 +74,27 @@ class TestAttackWrapper:
         mean, std = cifar10_stats
 
         model = torchvision.models.resnet50(pretrained=False, num_classes=10).eval()
-        input_sample = torch.randn(batch_size, 3, input_size, input_size, dtype=torch.float)
-        return_sample = torch.randn(batch_size, 3, input_size, input_size, dtype=torch.float)
+        input_sample = torch.randn(
+            batch_size, 3, input_size, input_size, dtype=torch.float
+        )
+        return_sample = torch.randn(
+            batch_size, 3, input_size, input_size, dtype=torch.float
+        )
         devices = set(["cpu", "cuda"]) if torch.cuda.is_available() else set(["cpu"])
 
         for device in devices:
+
             def _forward_mock(self, *args, **kwargs):
                 return return_sample.to(device)
+
             model, input_sample = model.to(device), input_sample.to(device)
 
-            with unittest.mock.patch.object(fourier_attack.attack.AttackWrapper, '_forward', _forward_mock):
-                attacker = fourier_attack.attack.AttackWrapper(input_size, mean, std, device)
-                assert attacker(model, input_sample).shape == torch.Size([batch_size, 3, input_size, input_size])
+            with unittest.mock.patch.object(
+                fourier_attack.attack.AttackWrapper, "_forward", _forward_mock
+            ):
+                attacker = fourier_attack.attack.AttackWrapper(
+                    input_size, mean, std, device
+                )
+                assert attacker(model, input_sample).shape == torch.Size(
+                    [batch_size, 3, input_size, input_size]
+                )
