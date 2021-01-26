@@ -1,4 +1,4 @@
-from typing import Callable, Final, Tuple, Union
+from typing import Callable, Dict, Final, Tuple, Union
 
 import torch
 import torch.nn
@@ -81,7 +81,7 @@ class ExhausiveFourierAttack(fourier_attack.attack.AttackWrapper):
         eps: torch.Tensor,
         channel_sign: torch.Tensor,
         criterion_func: Callable[..., torch.Tensor],
-    ) -> torch.Tensor:
+    ) -> Tuple[torch.Tensor, Dict[str, torch.Tensor]]:
         """
         Parameters
         ----------

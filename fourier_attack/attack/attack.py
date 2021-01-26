@@ -2,7 +2,7 @@ import random
 from typing import Tuple, Union
 
 import torch
-from torch.types import _device
+from torch.types import Device
 
 import fourier_attack.util
 
@@ -13,7 +13,7 @@ def get_eps(
     step_size_max: float,
     scale_eps: bool,
     scale_each: bool,
-    device: _device,
+    device: Device,
 ) -> Tuple[torch.Tensor, torch.Tensor]:
     """
     return eps and step_size (used for every update).
@@ -60,7 +60,7 @@ class PixelModel(torch.nn.Module):
         input_size: int,
         mean: Tuple[float],
         std: Tuple[float],
-        device: _device,
+        device: Device,
     ) -> None:
         super().__init__()
         self.device = device
@@ -80,7 +80,7 @@ class AttackWrapper(torch.nn.Module):
         input_size: int,
         mean: Tuple[float],
         std: Tuple[float],
-        device: Union[_device, str, None],
+        device: Device,
     ):
         super().__init__()
         self.input_size = input_size
@@ -108,7 +108,7 @@ class AttackWrapper(torch.nn.Module):
         pixel_model.eval()
         # forward input to  pixel space
         pixel_x = self.denormalizer(x.detach())
-        pixel_return = self._forward(pixel_model, pixel_x, *args, **kwargs)
+        pixel_return = self._forward(pixel_model, pixel_x, *args, **kwargs)  # type: ignore
         if was_training:
             pixel_model.train()
 
