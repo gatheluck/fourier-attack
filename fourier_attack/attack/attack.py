@@ -1,5 +1,5 @@
 import random
-from typing import Tuple
+from typing import Tuple, Union
 
 import torch
 from torch.types import _device
@@ -63,11 +63,53 @@ class PixelModel(torch.nn.Module):
         device: _device,
     ) -> None:
         super().__init__()
-        self.model = model
+        self.device = device
+        self.model = model.to(self.device)
         self.normalizer = fourier_attack.util.Normalizer(
-            input_size, mean, std, device=device
+            input_size, mean, std, device=self.device
         )
 
     def forward(self, pixel_x: torch.Tensor) -> torch.Tensor:
         x = self.normalizer(pixel_x)  # rescale [0, 255] -> [0, 1] and normalize
         return self.model(x)  # IMPORTANT: this return is in [0, 1]
+
+
+class AttackWrapper(torch.nn.Module):
+    def __init__(
+        self,
+        input_size: int,
+        mean: Tuple[float],
+        std: Tuple[float],
+        device: Union[_device, str, None],
+    ):
+        super().__init__()
+        self.input_size = input_size
+        self.mean = mean
+        self.std = std
+        self.device = device
+        self.normalizer = fourier_attack.util.Normalizer(
+            self.input_size, self.mean, self.std, device=self.device
+        )
+        self.denormalizer = fourier_attack.util.Denormalizer(
+            self.input_size, self.mean, self.std, device=self.device
+        )
+
+    def forward(
+        self, model: torch.nn.Module, x: torch.Tensor, *args, **kwargs
+    ) -> torch.Tensor:
+        """
+        Return perturbed input in unit space [0,1]
+        This function shold be called from all Attacker.
+        """
+        was_training = model.training
+        pixel_model = PixelModel(
+            model, self.input_size, self.mean, self.std, self.device
+        )
+        pixel_model.eval()
+        # forward input to  pixel space
+        pixel_x = self.denormalizer(x.detach())
+        pixel_return = self._forward(pixel_model, pixel_x, *args, **kwargs)
+        if was_training:
+            pixel_model.train()
+
+        return self.normalizer(pixel_return)
