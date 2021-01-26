@@ -1,8 +1,8 @@
 import pathlib
-import numpy as np
 import random
 from typing import Final
 
+import numpy as np
 import pytest
 import torch
 import torchvision

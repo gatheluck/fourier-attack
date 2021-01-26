@@ -1,10 +1,7 @@
-from typing import Callable, Optional, Tuple, Union
+from typing import Callable, Final, Tuple, Union
 
 import torch
 import torch.nn
-import torchvision
-
-from typing import Final
 from torch.types import _device
 
 import fourier_attack.attack
@@ -35,6 +32,7 @@ class ExhausiveFourierAttack(fourier_attack.attack.AttackWrapper):
     device : torch.types._device
         The device used for calculation.
     """
+
     def __init__(
         self,
         input_size: int,
@@ -55,16 +53,21 @@ class ExhausiveFourierAttack(fourier_attack.attack.AttackWrapper):
         pixel_x: torch.Tensor,
         target: torch.Tensor,
     ) -> torch.Tensor:
-        """
-        """
+        """"""
         batch_size: Final[int] = pixel_x.size(0)
 
         eps = self.eps_max * torch.ones(batch_size).to(self.device)
 
-        sign_plus = torch.ones(batch_size)[:, None].repeat(1, 3).to(self.device)  # (B, 3)
-        channel_sign = torch.where(torch.rand_like(sign_plus) >= 0.5, sign_plus, -sign_plus)
+        sign_plus = (
+            torch.ones(batch_size)[:, None].repeat(1, 3).to(self.device)
+        )  # (B, 3)
+        channel_sign = torch.where(
+            torch.rand_like(sign_plus) >= 0.5, sign_plus, -sign_plus
+        )
 
-        pixel_perturbation, return_dict = self.run(pixel_model, pixel_x, target, eps, channel_sign, self.criterion_func)
+        pixel_perturbation, return_dict = self.run(
+            pixel_model, pixel_x, target, eps, channel_sign, self.criterion_func
+        )
 
         # IMPORTANT: this return is in PIXEL SPACE (=[0,255])
         return pixel_x + pixel_perturbation
@@ -104,15 +107,25 @@ class ExhausiveFourierAttack(fourier_attack.attack.AttackWrapper):
             losses = torch.zeros(B, F, dtype=torch.float, device=device)  # (B, F)
             corrects = torch.zeros(B, F, dtype=torch.float, device=device)  # (B, F)
 
-            all_spectrum = fourier_attack.fourier.basis.get_basis_spectrum(H, W_).to(device)  # (F, H, W_)
-            all_pixel_basis = 255. * fourier_attack.fourier.basis.spectrum_to_basis(all_spectrum)  # (F, H, W)
+            all_spectrum = fourier_attack.fourier.basis.get_basis_spectrum(H, W_).to(
+                device
+            )  # (F, H, W_)
+            all_pixel_basis = 255.0 * fourier_attack.fourier.basis.spectrum_to_basis(
+                all_spectrum
+            )  # (F, H, W)
 
             for f in range(F):
                 pixel_basis = all_pixel_basis[f, :, :]  # (H, W)
-                pixel_basis_ = pixel_basis[None, None, :, :].repeat(B, 3, 1, 1)  # (B, 3, H, W)
-                pixel_basis_ *= eps[:, None, None, None] * channel_sign[:, :, None, None]
+                pixel_basis_ = pixel_basis[None, None, :, :].repeat(
+                    B, 3, 1, 1
+                )  # (B, 3, H, W)
+                pixel_basis_ *= (
+                    eps[:, None, None, None] * channel_sign[:, :, None, None]
+                )
 
-                pixel_x_adv = torch.clamp(pixel_x + pixel_basis_, 0., 255.)  # (B, 3, H, W)
+                pixel_x_adv = torch.clamp(
+                    pixel_x + pixel_basis_, 0.0, 255.0
+                )  # (B, 3, H, W)
                 logit = pixel_model(pixel_x_adv)  # (B, #class)
 
                 loss = criterion_func(logit, target, reduction="none")  # (B)
@@ -121,17 +134,27 @@ class ExhausiveFourierAttack(fourier_attack.attack.AttackWrapper):
                 correct = fourier_attack.util.get_corrects(logit, target)[0]
                 corrects[:, f] = correct
 
-            index = losses.argmax(dim=-1)[:, None, None, None].repeat(1, 1, H, W)  # (B, 1, H, W)
-            pixel_basis_adv = all_pixel_basis[None, :, :, :].repeat(B, 1, 1, 1).gather(dim=1, index=index).view(B, 1, H, W)
+            index = losses.argmax(dim=-1)[:, None, None, None].repeat(
+                1, 1, H, W
+            )  # (B, 1, H, W)
+            pixel_basis_adv = (
+                all_pixel_basis[None, :, :, :]
+                .repeat(B, 1, 1, 1)
+                .gather(dim=1, index=index)
+                .view(B, 1, H, W)
+            )
             pixel_basis_adv_ = pixel_basis_adv.repeat(1, 3, 1, 1)
-            pixel_basis_adv_ *= eps[:, None, None, None] * channel_sign[:, :, None, None]
+            pixel_basis_adv_ *= (
+                eps[:, None, None, None] * channel_sign[:, :, None, None]
+            )
 
         # calculate returns
-        pixel_perturbation = torch.clamp(pixel_x + pixel_basis_adv_, 0.0, 255.0) - pixel_x
+        pixel_perturbation = (
+            torch.clamp(pixel_x + pixel_basis_adv_, 0.0, 255.0) - pixel_x
+        )
 
         return_dict = {
             "losses": losses.view(B, H, W_),
             "corrects": corrects.view(B, H, W_),
         }
         return pixel_perturbation, return_dict
-
