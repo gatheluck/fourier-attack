@@ -113,3 +113,7 @@ class AttackWrapper(torch.nn.Module):
             pixel_model.train()
 
         return self.normalizer(pixel_return)
+
+    def _forward(self):
+        # here should be abc. However we want to use pytest.
+        raise ValueError("This function should not be call directly.")
