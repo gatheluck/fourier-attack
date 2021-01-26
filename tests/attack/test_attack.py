@@ -90,7 +90,7 @@ class TestAttackWrapper:
             model, input_sample = model.to(device), input_sample.to(device)
 
             with unittest.mock.patch.object(
-                fourier_attack.attack.AttackWrapper, "_forward", _forward_mock
+                fourier_attack.attack.AttackWrapper, "_forward", _forward_mock, create=True
             ):
                 attacker = fourier_attack.attack.AttackWrapper(
                     input_size, mean, std, device
