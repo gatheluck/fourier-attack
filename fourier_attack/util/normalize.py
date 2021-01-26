@@ -1,7 +1,7 @@
 from typing import Tuple
 
 import torch
-from torch.types import _device
+from torch.types import Device
 
 
 class Normalizer(torch.nn.modules.Module):
@@ -29,7 +29,7 @@ class Normalizer(torch.nn.modules.Module):
         input_size: int,
         mean: Tuple[float],
         std: Tuple[float],
-        device: _device,
+        device: Device,
         from_pixel_space: bool = True,
     ) -> None:
         super().__init__()
@@ -79,7 +79,7 @@ class Denormalizer(torch.nn.modules.Module):
         input_size: int,
         mean: Tuple[float],
         std: Tuple[float],
-        device: _device,
+        device: Device,
         to_pixel_space: bool = True,
     ) -> None:
         super().__init__()

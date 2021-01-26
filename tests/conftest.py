@@ -61,12 +61,14 @@ def denormalize_cifar10_loader():
 @pytest.fixture
 def pretrained_cifar10_resnet50():
     model = torchvision.models.resnet50(pretrained=False, num_classes=10)
-    model.load_state_dict(torch.load(PRETRAONED_WEIGHT))
+    if torch.cuda.is_available():
+        model.load_state_dict(torch.load(PRETRAONED_WEIGHT))
     return model.eval()
 
 
 @pytest.fixture
 def pretrained_cifar10_resnet50_adv():
     model = torchvision.models.resnet50(pretrained=False, num_classes=10)
-    model.load_state_dict(torch.load(PRETRAONED_WEIGHT_ADV))
+    if torch.cuda.is_available():
+        model.load_state_dict(torch.load(PRETRAONED_WEIGHT_ADV))
     return model.eval()

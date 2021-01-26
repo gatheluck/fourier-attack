@@ -11,9 +11,9 @@ class TestExhausiveFourierAttack:
     def test__run(
         self, pretrained_cifar10_resnet50, cifar10_stats, denormalize_cifar10_loader
     ):
-        devices = {"cuda"}
+        devices = set(["cuda"]) if torch.cuda.is_available() else set()
         output_root: Final = pathlib.Path("logs/test/")
-        output_root.mkdir()
+        output_root.mkdir(exist_ok=True, parents=True)
 
         model = pretrained_cifar10_resnet50
         criterion_func = torch.nn.functional.cross_entropy
@@ -75,8 +75,9 @@ class TestExhausiveFourierAttack:
     ):
         input_size: Final[int] = 32
         eps_max: Final[float] = 8.0
-        devices = {"cuda"}
+        devices = set(["cuda"]) if torch.cuda.is_available() else set()
         output_root: Final = pathlib.Path("logs/test/")
+        output_root.mkdir(exist_ok=True, parents=True)
 
         model = pretrained_cifar10_resnet50
         criterion_func = torch.nn.functional.cross_entropy
