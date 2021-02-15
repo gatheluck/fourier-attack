@@ -1,8 +1,7 @@
-from typing import Callable, Dict, Final, Tuple, Union
+from typing import Callable, Dict, Final, Optional, Tuple
 
 import torch
 import torch.nn
-from torch.types import _device
 
 import fourier_attack.attack
 import fourier_attack.fourier.basis
@@ -36,11 +35,11 @@ class ExhausiveFourierAttack(fourier_attack.attack.AttackWrapper):
     def __init__(
         self,
         input_size: int,
-        mean: Tuple[float],
-        std: Tuple[float],
+        mean: Tuple[float, float, float],
+        std: Tuple[float, float, float],
         eps_max: float,
         criterion_func: Callable[..., torch.Tensor],
-        device: Union[_device, str, None],
+        device: Optional[torch.device],
     ) -> None:
         super().__init__(input_size=input_size, mean=mean, std=std, device=device)
         self.eps_max = eps_max

@@ -1,8 +1,7 @@
 import random
-from typing import Tuple
+from typing import Optional, Tuple
 
 import torch
-from torch.types import Device
 
 import fourier_attack.util
 
@@ -13,7 +12,7 @@ def get_eps(
     step_size_max: float,
     scale_eps: bool,
     scale_each: bool,
-    device: Device,
+    device: Optional[torch.device],
 ) -> Tuple[torch.Tensor, torch.Tensor]:
     """
     return eps and step_size (used for every update).
@@ -58,9 +57,9 @@ class PixelModel(torch.nn.Module):
         self,
         model: torch.nn.Module,
         input_size: int,
-        mean: Tuple[float],
-        std: Tuple[float],
-        device: Device,
+        mean: Tuple[float, float, float],
+        std: Tuple[float, float, float],
+        device: Optional[torch.device],
     ) -> None:
         super().__init__()
         self.device = device
@@ -78,9 +77,9 @@ class AttackWrapper(torch.nn.Module):
     def __init__(
         self,
         input_size: int,
-        mean: Tuple[float],
-        std: Tuple[float],
-        device: Device,
+        mean: Tuple[float, float, float],
+        std: Tuple[float, float, float],
+        device: Optional[torch.device],
     ):
         super().__init__()
         self.input_size = input_size
