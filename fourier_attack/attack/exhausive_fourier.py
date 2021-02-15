@@ -14,22 +14,11 @@ class ExhausiveFourierAttack(fourier_attack.attack.AttackWrapper):
     This model takes input in unnormalized pixcel space: [0, 255.].
     Output tensor is in unit space: [0, 1.].
 
-    Parameters
-    ----------
-    model : torch.nn.Module
-        The torch model in unit space.
-    input_size : int
-        The size of input image which is represented by 2D tensor.
-    mean : Tuple[float]
-        The mean of input data distribution.
-    std : Tuple[float]
-        The standard diviation of input data distribution.
-    eps_max : float
-        The max size of purturbation.
-    criterion_func : Callable[..., torch.Tensor]
-        The loss function used for training model.
-    device : torch.types._device
-        The device used for calculation.
+    Attributes:
+        eps_max (float): The max size of purturbation.
+        criterion_func (Callable[..., torch.Tensor]): The loss function used for training model.
+        device(torch.device, optional): The device used for calculation.
+
     """
 
     def __init__(
@@ -41,6 +30,18 @@ class ExhausiveFourierAttack(fourier_attack.attack.AttackWrapper):
         criterion_func: Callable[..., torch.Tensor],
         device: Optional[torch.device],
     ) -> None:
+        """
+
+        Args:
+            model (torch.nn.Module): The torch model in unit space.
+            input_size (int): The size of input image which is represented by 2D tensor.
+            mean (Tuple[float, float, float]): The mean of input data distribution.
+            std (Tuple[float, float, float]): The standard diviation of input data distribution.
+            eps_max (float): The max size of purturbation.
+            criterion_func (Callable[..., torch.Tensor]): The loss function used for training model.
+            device(torch.device, optional): The device used for calculation.
+
+        """
         super().__init__(input_size=input_size, mean=mean, std=std, device=device)
         self.eps_max = eps_max
         self.criterion_func = criterion_func
@@ -52,7 +53,21 @@ class ExhausiveFourierAttack(fourier_attack.attack.AttackWrapper):
         pixel_x: torch.Tensor,
         target: torch.Tensor,
     ) -> torch.Tensor:
-        """"""
+        """Return perturbed input in pixel space.
+
+        Note:
+            This method shoud be called through fourier_attack.attack.AttackWrapper.forward method.
+            DO NOT call this method directly.
+
+        Args:
+            pixel_model (torch.nn.Module):  The torch model in pixel space.
+            pixel_x (torch.Tensor): The input tensor lies in unnormzlized pixel space.
+            target (torch.Tensor): The target labels of pixel_x.
+
+        Returns
+            torch.Tensor: The perturbed input in pixel space [0,255].
+
+        """
         batch_size: Final[int] = pixel_x.size(0)
 
         eps = self.eps_max * torch.ones(batch_size).to(self.device)
@@ -81,21 +96,19 @@ class ExhausiveFourierAttack(fourier_attack.attack.AttackWrapper):
         channel_sign: torch.Tensor,
         criterion_func: Callable[..., torch.Tensor],
     ) -> Tuple[torch.Tensor, Dict[str, torch.Tensor]]:
-        """
-        Parameters
-        ----------
-        pixel_model : torch.nn.Module
-            The pixel model
-        pixel_x : torch.Tensor, (B,C,H,W)
-            The input tensor in pixel space.
-        target : torch.Tensor, (B)
-            The target label of input.
-        eps : torch.Tensor, (B)
-            The size of purturbation.
-        channel_sign : torch.Tensor, (B,C)
-            The sign of purturbation.
-        criterion_func : Callable
-            The criterion function.
+        """Calculate perturbation in pixel space.
+
+        Args:
+            pixel_model (torch.nn.Module): The pixel model
+            pixel_x (torch.Tensor): The input tensor in pixel space.
+            target (torch.Tensor): The target label of input.
+            eps (torch.Tensor): The size of purturbation.
+            channel_sign (torch.Tensor): The sign of purturbation.
+            criterion_func (Callable[..., torch.Tensor]): The criterion function.
+
+        Returns:
+            Tuple[torch.Tensor, Dict[str, torch.Tensor]]: 
+
         """
         B, _, H, W = pixel_x.size()
         W_ = W // 2 + 1

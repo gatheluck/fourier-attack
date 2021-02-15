@@ -9,18 +9,9 @@ class Normalizer(torch.nn.modules.Module):
     Normalize input tensor without breaking computational graph.
     Input tensor might be in pixel space: [0, 255.] or unit space: [0, 1.]
 
-    Parameters
-    ----------
-    input_size : int
-        The size of input image which is represented by 2D tensor.
-    mean : Tuple[flaot]
-        The mean of input data distribution.
-    std : Tuple[flaot]
-        The standard diviation of input data distribution.
-    device : torch.types._device
-        The device used for calculation.
-    from_pixcel_space : bool
-        If True, an input tensor is represented in pixel space (=[0, 255.])
+    Attributes:
+        from_pixel_space (bool): If True, an input tensor is represented in pixel space (=[0, 255.])
+
     """
 
     def __init__(
@@ -31,6 +22,16 @@ class Normalizer(torch.nn.modules.Module):
         device: Optional[torch.device],
         from_pixel_space: bool = True,
     ) -> None:
+        """
+
+        Args:
+            input_size (int): The size of input image which is represented by 2D tensor.
+            mean (Tuple[float, float, float]): The mean of input data distribution.
+            std (Tuple[float, float, float]): The standard diviation of input data distribution.
+            device (torch.device, optional): The device used for calculation.
+            from_pixcel_space (bool): If True, an input tensor is represented in pixel space (=[0, 255.])
+
+        """
         super().__init__()
         self.from_pixel_space = from_pixel_space
         num_channel = len(mean)
@@ -59,18 +60,9 @@ class Denormalizer(torch.nn.modules.Module):
     Denormalize input tensor without breaking computational graph.
     Output tensor might be in pixel space: [0, 255.] or unit space: [0, 1.]
 
-    Parameters
-    ----------
-    input_size : int
-        The size of input image which is represented by 2D tensor.
-    mean : Tuple[flaot]
-        The mean of input data distribution.
-    std : Tuple[flaot]
-        The standard diviation of input data distribution.
-    device : torch.types._device
-        The device used for calculation.
-    to_pixcel_space : bool
-        If True, an output tensor is represented in pixel space (=[0, 255.])
+    Attributes:
+        to_pixel_space (bool): If True, an output tensor is represented in pixel space (=[0, 255.])
+
     """
 
     def __init__(
@@ -81,6 +73,16 @@ class Denormalizer(torch.nn.modules.Module):
         device: Optional[torch.device],
         to_pixel_space: bool = True,
     ) -> None:
+        """
+
+        Args:
+            input_size (int): The size of input image which is represented by 2D tensor.
+            mean (Tuple[float, float, float]): The mean of input data distribution.
+            std (Tuple[float, float, float]) : The standard diviation of input data distribution.
+            device (torch.device, optional): The device used for calculation.
+            to_pixcel_space (bool): If True, an output tensor is represented in pixel space (=[0, 255.])
+
+        """
         super().__init__()
         self.to_pixel_space = to_pixel_space
         num_channel = len(mean)
