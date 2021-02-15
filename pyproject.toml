@@ -2,8 +2,8 @@
 name = "fourier-attack"
 version = "0.1.0"
 description = ""
-authors = ["yoshihiro fukuhara"]
-license = "MIT License"
+authors = ["gatheluck <gatheluck+tech@gmail.com>"]
+license = "MIT"
 
 [tool.poetry.dependencies]
 python = "^3.8"
