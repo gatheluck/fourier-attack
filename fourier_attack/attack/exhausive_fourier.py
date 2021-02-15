@@ -107,7 +107,7 @@ class ExhausiveFourierAttack(fourier_attack.attack.AttackWrapper):
             criterion_func (Callable[..., torch.Tensor]): The criterion function.
 
         Returns:
-            Tuple[torch.Tensor, Dict[str, torch.Tensor]]: 
+            Tuple[torch.Tensor, Dict[str, torch.Tensor]]: Tuple of perturbation in pixel space and dict of info.
 
         """
         B, _, H, W = pixel_x.size()

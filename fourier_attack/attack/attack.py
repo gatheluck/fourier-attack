@@ -106,6 +106,7 @@ class AttackWrapper(torch.nn.Module):
         device(torch.device, optional): The device used for calculation.
 
     """
+
     def __init__(
         self,
         input_size: int,
