@@ -5,6 +5,7 @@ import torch
 import torchvision
 
 import fourier_attack.attack.pgd
+from fourier_attack.util import Denormalizer
 
 
 class TestPgdAttack:
@@ -13,7 +14,7 @@ class TestPgdAttack:
     ):
         input_size: Final = 32
         num_iteration: Final = 8
-        eps_max: Final = 8.0
+        eps_max: Final = 16.0
         step_size: Final = eps_max / num_iteration
         rand_init: Final = True
         scale_eps: Final = True
@@ -51,8 +52,9 @@ class TestPgdAttack:
                     batch_size = x.size(0)
 
                     x_adv = attacker(model, x, t)
+                    denormalizer = Denormalizer(input_size, mean, std, device, False)
                     torchvision.utils.save_image(
-                        x_adv, output_root / f"forward-pgd-{norm}.png"
+                        denormalizer(x_adv), output_root / f"forward-pgd-{norm}.png"
                     )
 
                     assert x_adv.size() == torch.Size([batch_size, 3, 32, 32])
