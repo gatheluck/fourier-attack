@@ -185,7 +185,7 @@ class PgdAttack(fourier_attack.attack.AttackWrapper):
             l2_eps_max = eps
 
         for it in range(self.num_iteration):
-            loss = self.criterion(logit, target)
+            loss = self.criterion_func(logit, target)
             loss.backward()
 
             if self.avoid_target:
