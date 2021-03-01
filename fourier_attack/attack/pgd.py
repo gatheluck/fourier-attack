@@ -10,7 +10,7 @@ import fourier_attack.util
 
 
 def normalized_random_init(
-    shape: torch.Size, norm: str, device: torch.device
+    shape: torch.Size, norm: str, device: Optional[torch.device]
 ) -> torch.Tensor:
     """
     Args:
@@ -56,8 +56,7 @@ class PgdAttack(fourier_attack.attack.AttackWrapper):
         criterion_func: Callable[..., torch.Tensor],
         device: Optional[torch.device],
     ) -> None:
-        """
-        """
+        """"""
         super().__init__(input_size=input_size, mean=mean, std=std, device=device)
         self.num_iteration = num_iteration
         self.eps_max = eps_max
@@ -103,7 +102,12 @@ class PgdAttack(fourier_attack.attack.AttackWrapper):
         # compute delta in pixel space
         if self.num_iteration:  # run iteration
             pixel_delta = self._run(
-                pixel_model, pixel_input, pixel_delta, target, base_eps, step_size,
+                pixel_model,
+                pixel_input,
+                pixel_delta,
+                target,
+                base_eps,
+                step_size,
             )
         else:  # if self.num_iteration is 0, return just initialization result
             pixel_delta.data = (
@@ -115,8 +119,8 @@ class PgdAttack(fourier_attack.attack.AttackWrapper):
         return pixel_input + pixel_delta
 
     def get_base_eps_and_step_size(
-            self,
-            batch_size: int) -> Tuple[torch.Tensor, torch.Tensor]:
+        self, batch_size: int
+    ) -> Tuple[torch.Tensor, torch.Tensor]:
         """This method return appropriate base_eps and step_size.
 
         Args:
@@ -134,7 +138,9 @@ class PgdAttack(fourier_attack.attack.AttackWrapper):
             return rand.mul(self.eps_max), rand.mul(self.step_size)
         else:
             base_eps = self.eps_max * torch.ones(batch_size, device=self.device)  # (B)
-            step_size = self.step_size * torch.ones(batch_size, device=self.device)  # (B)
+            step_size = self.step_size * torch.ones(
+                batch_size, device=self.device
+            )  # (B)
             return base_eps, step_size
 
     def _init_delta(self, shape: torch.Size, eps: torch.Tensor) -> torch.Tensor:
@@ -152,7 +158,9 @@ class PgdAttack(fourier_attack.attack.AttackWrapper):
         if not self.rand_init:
             return torch.zeros(shape, requires_grad=True, device=self.device)
         else:
-            init_delta = normalized_random_init(shape, self.norm, self.device)  # initialize delta for linf or l2
+            init_delta = normalized_random_init(
+                shape, self.norm, self.device
+            )  # initialize delta for linf or l2
             init_delta = eps[:, None, None, None] * init_delta  # scale by eps
             init_delta.requires_grad_()
             return init_delta
